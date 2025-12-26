@@ -62,20 +62,24 @@ def create_app():
     
     # Create tables
     with app.app_context():
-        # Import models so SQLAlchemy knows about them
-        from app.models import payment  # noqa: F401
-
-        db.create_all()
-        from app.utils.seed_cities import seed_cities
-        from app.utils.schema import ensure_schema_consistency
-        # Seed vehicle catalogs
-        from app.utils.seed_catalog import seed_catalogs
-        seed_cities()
-        ensure_schema_consistency()
         try:
-            seed_catalogs()
+            # Import models so SQLAlchemy knows about them
+            from app.models import payment  # noqa: F401
+
+            db.create_all()
+            from app.utils.seed_cities import seed_cities
+            from app.utils.schema import ensure_schema_consistency
+            # Seed vehicle catalogs
+            from app.utils.seed_catalog import seed_catalogs
+            seed_cities()
+            ensure_schema_consistency()
+            try:
+                seed_catalogs()
+            except Exception as e:
+                app.logger.exception('Failed to seed catalogs: %s', e)
         except Exception as e:
-            app.logger.exception('Failed to seed catalogs: %s', e)
+            app.logger.error('Database initialization failed: %s', e)
+            app.logger.warning('App will continue but database operations may fail')
     
     @app.route('/api/health', methods=['GET'])
     def health():

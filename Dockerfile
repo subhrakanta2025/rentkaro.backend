@@ -14,11 +14,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Create uploads directory with proper permissions
+RUN mkdir -p uploads/agencies uploads/kyc uploads/vehicles && \
+    chown -R appuser:appuser uploads
+
 USER appuser
 
-ENV FLASK_ENV=production \
-    PORT=8080
+ENV FLASK_ENV=production
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "gunicorn -b 0.0.0.0:${PORT:-8080} run:app"]
+# Use gunicorn with proper workers and timeout for Cloud Run
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 --access-logfile - --error-logfile - run:app
