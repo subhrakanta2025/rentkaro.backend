@@ -213,7 +213,7 @@ def get_vehicle(vehicle_id):
 def create_vehicle():
     """Create a new vehicle"""
     user_id = get_jwt_identity()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     try:
         vehicle = Vehicle(
@@ -383,11 +383,31 @@ def update_availability(vehicle_id):
     
     if vehicle.owner_id != user_id:
         return jsonify({'error': 'Unauthorized'}), 403
-    
-    vehicle.is_available = data.get('isAvailable', vehicle.is_available)
-    db.session.commit()
-    
-    return jsonify({'message': 'Availability updated successfully'}), 200
+    # Safely parse boolean values coming from clients (they may send strings)
+    def _to_bool(val, default):
+        if val is None:
+            return default
+        if isinstance(val, bool):
+            return val
+        if isinstance(val, (int, float)):
+            return bool(val)
+        if isinstance(val, str):
+            v = val.strip().lower()
+            if v in ('true', '1', 'yes', 'y', 'on'):
+                return True
+            if v in ('false', '0', 'no', 'n', 'off'):
+                return False
+        return default
+
+    try:
+        new_avail = _to_bool(data.get('isAvailable'), vehicle.is_available)
+        vehicle.is_available = new_avail
+        db.session.commit()
+        return jsonify({'message': 'Availability updated successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f'[ERROR] update_availability failed for vehicle {vehicle_id}:', e)
+        return jsonify({'error': str(e)}), 500
 
 @vehicles_bp.route('/<vehicle_id>', methods=['DELETE'])
 @jwt_required()

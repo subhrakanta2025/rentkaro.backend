@@ -180,8 +180,15 @@ def upload_kyc_document():
         }), 200
         
     except Exception as e:
+        import traceback
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        tb = traceback.format_exc()
+        try:
+            current_app.logger.error('[KYC Upload] Exception: %s\n%s', str(e), tb)
+        except Exception:
+            print('[KYC Upload] Exception:', str(e))
+            print(tb)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @kyc_bp.route('/status', methods=['GET'])

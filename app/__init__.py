@@ -14,10 +14,62 @@ def create_app():
     app = Flask(__name__)
     config = get_config()
     app.config.from_object(config)
+    # Ensure instance directory exists and sqlite db file is writable when using file-based sqlite
+    db_uri = app.config.get('SQLALCHEMY_DATABASE_URI', '') or ''
+    if db_uri.startswith('sqlite:///') and not db_uri.startswith('sqlite:////'):
+        # paths like sqlite:///instance/ride_rentals.db -> file path is relative to app.root_path
+        db_path = db_uri.replace('sqlite:///', '')
+        # If it's not an absolute path, make sure it's under the project root
+        if not os.path.isabs(db_path):
+            instance_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'instance')
+            instance_dir = os.path.normpath(instance_dir)
+            os.makedirs(instance_dir, exist_ok=True)
+            full_db_path = os.path.join(instance_dir, os.path.basename(db_path))
+        else:
+            full_db_path = db_path
+
+        try:
+            # Create empty file if not exists and ensure writable
+            if not os.path.exists(full_db_path):
+                open(full_db_path, 'a').close()
+            # Try opening for append to test writability
+            with open(full_db_path, 'a'):
+                pass
+        except Exception as ex:
+            app.logger.error('Failed to ensure sqlite database file is writable: %s', ex)
+            app.logger.warning('If running in a read-only filesystem (for example in some cloud builds), set DATABASE_URL to a writable DB.')
     
-    # Set upload directory
-    app.config['UPLOAD_DIR'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
-    os.makedirs(app.config['UPLOAD_DIR'], exist_ok=True)
+    # Set upload directory. Prefer a writable location in cloud environments (/tmp)
+    default_upload_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
+    preferred_tmp = os.getenv('UPLOAD_DIR') or os.getenv('TMPDIR') or os.getenv('TMP') or os.getenv('TEMP') or '/tmp'
+    # If preferred_tmp exists and is writable, use it under a subfolder, otherwise fall back to project uploads
+    chosen_upload = default_upload_dir
+    try:
+        tmp_candidate = os.path.join(preferred_tmp, 'rentkaro_uploads')
+        os.makedirs(tmp_candidate, exist_ok=True)
+        # test writability
+        testfile = os.path.join(tmp_candidate, '.write_test')
+        with open(testfile, 'w') as f:
+            f.write('ok')
+        os.remove(testfile)
+        chosen_upload = tmp_candidate
+    except Exception:
+        # fallback to project uploads directory
+        try:
+            os.makedirs(default_upload_dir, exist_ok=True)
+            testfile = os.path.join(default_upload_dir, '.write_test')
+            with open(testfile, 'w') as f:
+                f.write('ok')
+            os.remove(testfile)
+            chosen_upload = default_upload_dir
+        except Exception as ex:
+            app.logger.error('No writable upload directory found: %s', ex)
+            # Last resort: use current working directory under uploads
+            cwd_upload = os.path.join(os.getcwd(), 'uploads')
+            os.makedirs(cwd_upload, exist_ok=True)
+            chosen_upload = cwd_upload
+
+    app.config['UPLOAD_DIR'] = chosen_upload
     
     # Initialize extensions
     db.init_app(app)

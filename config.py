@@ -22,7 +22,9 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///ride_rentals.db')
+    # Prefer a database file inside the project's `instance/` folder which is intended
+    # for writable runtime data. This avoids accidental use of read-only working dirs.
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///instance/ride_rentals.db')
     SQLALCHEMY_ECHO = True
 
 class ProductionConfig(Config):
