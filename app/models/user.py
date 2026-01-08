@@ -13,7 +13,10 @@ class User(db.Model):
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    password_hash = db.Column(db.String(255), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=True)
+    # Social login fields
+    provider = db.Column(db.String(50), nullable=True)
+    provider_id = db.Column(db.String(255), nullable=True, index=True)
     is_active = db.Column(db.Boolean, default=False)  # Account activation status
     otp_code = db.Column(db.String(6), nullable=True)  # 6-digit OTP
     otp_expires_at = db.Column(db.DateTime, nullable=True)  # OTP expiry time

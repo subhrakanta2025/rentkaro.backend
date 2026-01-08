@@ -7,6 +7,7 @@ from app import db
 from app.models.user import User, Profile, UserRoleModel
 from app.utils.mail import generate_otp, send_otp_email, send_activation_email, send_password_reset_email
 from datetime import datetime, timedelta
+import requests
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -343,6 +344,94 @@ def login():
         },
         'access_token': access_token
     }), 200
+
+
+@auth_bp.route('/login/google', methods=['POST'])
+def login_with_google():
+    """Login or register using Google ID token. Expects JSON: {"idToken": "..."} """
+    data = request.get_json() or {}
+    id_token = data.get('idToken')
+
+    if not id_token:
+        return jsonify({'error': 'idToken is required'}), 400
+
+    # Verify token with Google's tokeninfo endpoint
+    try:
+        resp = requests.get('https://oauth2.googleapis.com/tokeninfo', params={'id_token': id_token}, timeout=5)
+        if resp.status_code != 200:
+            return jsonify({'error': 'Invalid Google ID token'}), 401
+        info = resp.json()
+    except Exception as e:
+        return jsonify({'error': 'Failed to verify token with Google', 'details': str(e)}), 500
+
+    # tokeninfo returns fields including 'email', 'sub' (user id), 'email_verified', 'name', 'picture'
+    email = (info.get('email') or '').lower().strip()
+    provider_id = info.get('sub')
+    email_verified = info.get('email_verified') in ('1', 'true', True)
+    full_name = info.get('name')
+    picture = info.get('picture')
+
+    if not email or not provider_id:
+        return jsonify({'error': 'Invalid token payload'}), 400
+
+    try:
+        user = User.query.filter_by(email=email).first()
+
+        # If user exists but is from another provider and has no password, allow linking
+        if not user:
+            user = User(email=email)
+            user.is_active = True
+            user.provider = 'google'
+            user.provider_id = provider_id
+            # no password for social logins
+            db.session.add(user)
+            db.session.flush()
+
+            # create profile
+            profile = Profile(user_id=user.id, full_name=full_name or '', avatar_url=picture)
+            db.session.add(profile)
+
+            # default role
+            user_role = UserRoleModel(user_id=user.id, role='customer')
+            db.session.add(user_role)
+        else:
+            # existing user: ensure provider info set
+            user.provider = user.provider or 'google'
+            user.provider_id = user.provider_id or provider_id
+            user.is_active = True
+            # ensure profile exists
+            profile = Profile.query.filter_by(user_id=user.id).first()
+            if not profile:
+                profile = Profile(user_id=user.id, full_name=full_name or '', avatar_url=picture)
+                db.session.add(profile)
+
+        db.session.commit()
+
+        access_token = create_access_token(identity=user.id)
+
+        user_role = UserRoleModel.query.filter_by(user_id=user.id).first()
+
+        profile = Profile.query.filter_by(user_id=user.id).first()
+
+        return jsonify({
+            'message': 'Login successful',
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'role': user_role.role if user_role else 'customer',
+                'profile': {
+                    'fullName': profile.full_name if profile else '',
+                    'phone': profile.phone if profile else '',
+                    'avatarUrl': profile.avatar_url if profile else None,
+                    'avatarLocked': profile.avatar_locked if profile else False,
+                },
+                'canListVehicles': bool(user.agency)
+            },
+            'access_token': access_token
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to login with Google', 'details': str(e)}), 500
 
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()

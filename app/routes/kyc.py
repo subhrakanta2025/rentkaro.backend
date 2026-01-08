@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 import os
 import uuid
 import base64
+from datetime import datetime, date
 from app import db
 from app.models.kyc import KYCVerification
 from app.models.user import Profile
@@ -25,6 +26,22 @@ def ensure_upload_folder():
     folder = get_upload_folder()
     os.makedirs(folder, exist_ok=True)
     return folder
+
+
+def _parse_iso_date(value, field_name: str):
+    """Parse ISO-8601 date strings to date objects for DB storage."""
+    if value is None or value == '':
+        return None
+    if isinstance(value, date) and not isinstance(value, datetime):
+        return value
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, str):
+        try:
+            return datetime.fromisoformat(value.replace('Z', '')).date()
+        except ValueError:
+            raise ValueError(f"{field_name} must be a valid ISO-8601 date (YYYY-MM-DD)")
+    raise ValueError(f"{field_name} must be a valid date string")
 
 @kyc_bp.route('/upload', methods=['POST'])
 @jwt_required()
@@ -180,8 +197,15 @@ def upload_kyc_document():
         }), 200
         
     except Exception as e:
+        import traceback
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        tb = traceback.format_exc()
+        try:
+            current_app.logger.error('[KYC Upload] Exception: %s\n%s', str(e), tb)
+        except Exception:
+            print('[KYC Upload] Exception:', str(e))
+            print(tb)
+        return jsonify({'error': 'Internal server error'}), 500
 
 
 @kyc_bp.route('/status', methods=['GET'])
@@ -242,6 +266,7 @@ def submit_kyc():
     data = request.get_json()
     
     try:
+        dl_expiry_date = _parse_iso_date(data.get('dlExpiryDate'), 'dlExpiryDate')
         kyc = KYCVerification.query.filter_by(user_id=user_id).first()
         
         if not kyc:
@@ -263,7 +288,7 @@ def submit_kyc():
         if 'drivingLicenseNumber' in data:
             kyc.driving_license_number = data['drivingLicenseNumber']
             kyc.dl_document_url = data.get('dlDocumentUrl')
-            kyc.dl_expiry_date = data.get('dlExpiryDate')
+            kyc.dl_expiry_date = dl_expiry_date
         
         if 'selfieUrl' in data:
             kyc.selfie_document_url = data['selfieUrl']
@@ -288,6 +313,9 @@ def submit_kyc():
             'kyc': {'id': kyc.id}
         }), 201
         
+    except ValueError as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500

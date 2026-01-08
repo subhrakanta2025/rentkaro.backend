@@ -4,6 +4,7 @@ from .users import users_bp
 from .vehicles import vehicles_bp
 from .bookings import bookings_bp
 from .agencies import agencies_bp
+from .agency_kyc import agency_kyc_bp
 from .kyc import kyc_bp
 
 __all__ = [
@@ -12,5 +13,6 @@ __all__ = [
     'vehicles_bp',
     'bookings_bp',
     'agencies_bp',
+    'agency_kyc_bp',
     'kyc_bp'
 ]

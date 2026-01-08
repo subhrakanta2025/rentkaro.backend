@@ -6,13 +6,14 @@ from app.models.vehicle import Vehicle, VehicleImage
 from app.models.agency import Agency
 from app.models.user import User
 from app.models.payment import Payment
-from sqlalchemy import or_
-from datetime import datetime
+from sqlalchemy import or_, and_
+from datetime import datetime, timedelta
 import os
 import requests
 import hmac
 import hashlib
 import json
+from app.utils.mail import send_feedback_request
 
 bookings_bp = Blueprint('bookings', __name__, url_prefix='/api/bookings')
 
@@ -157,6 +158,13 @@ def get_bookings():
     
     return jsonify({'bookings': result}), 200
 
+
+@bookings_bp.route('/me', methods=['GET'])
+@jwt_required()
+def get_my_bookings_alias():
+    """Alias for GET /bookings scoped to the authenticated user/agency."""
+    return get_bookings()
+
 @bookings_bp.route('/<booking_id>', methods=['GET'])
 @jwt_required()
 def get_booking(booking_id):
@@ -236,9 +244,14 @@ def check_vehicle_availability():
     if end_dt <= start_dt:
         return jsonify({'error': 'end_date must be after start_date'}), 400
 
+    cutoff = datetime.utcnow() - timedelta(minutes=2)
+    blocking_statuses = ['confirmed', 'active']
     overlapping = Booking.query.filter(
         Booking.vehicle_id == vehicle_id,
-        Booking.status != 'cancelled',
+        or_(
+            Booking.status.in_(blocking_statuses),
+            and_(Booking.status == 'pending', Booking.created_at >= cutoff)
+        ),
         Booking.start_date < end_dt,
         Booking.end_date > start_dt
     ).all()
@@ -285,6 +298,21 @@ def create_booking():
         end_dt = datetime.fromisoformat(data['endDate'])
         if end_dt <= start_dt:
             return jsonify({'error': 'End date must be after start date'}), 400
+
+        # Prevent overlapping bookings for the same vehicle
+        cutoff = datetime.utcnow() - timedelta(minutes=2)
+        blocking_statuses = ['confirmed', 'active']
+        overlapping = Booking.query.filter(
+            Booking.vehicle_id == vehicle.id,
+            or_(
+                Booking.status.in_(blocking_statuses),
+                and_(Booking.status == 'pending', Booking.created_at >= cutoff)
+            ),
+            Booking.start_date < end_dt,
+            Booking.end_date > start_dt
+        ).first()
+        if overlapping:
+            return jsonify({'error': 'Vehicle is not available for the selected dates'}), 409
 
         # Compute number_of_days if client did not send it
         number_of_days = data.get('numberOfDays')
@@ -341,6 +369,15 @@ def update_booking_status(booking_id):
     
     booking.status = data['status']
     db.session.commit()
+    # If booking is completed, send feedback request email to customer
+    try:
+        if data['status'] == 'completed':
+            customer = User.query.get(booking.customer_id)
+            if customer and customer.email:
+                send_feedback_request(customer.email, booking.id)
+    except Exception:
+        # Don't let email errors affect the main flow
+        pass
     
     return jsonify({'message': 'Booking status updated'}), 200
 
