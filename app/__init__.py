@@ -36,13 +36,15 @@ def create_app():
     migrate.init_app(app, db)
     
     # Configure CORS
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": "*",
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
-        }
-    })
+    origins = [o.strip() for o in app.config.get('CORS_ORIGINS', ['*']) if o.strip()]
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": origins}},
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+        expose_headers=["Content-Disposition"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    )
     
     # Register blueprints
     from app.routes.auth import auth_bp
