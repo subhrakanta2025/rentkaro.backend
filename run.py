@@ -9,9 +9,11 @@ load_dotenv()
 
 from app import create_app
 
+# Instantiate once so gunicorn (run:app) can import it
+app = create_app()
+
 def main():
-    """Create app and run when executed directly."""
-    app = create_app()
+    """Run the Flask dev server when executed directly."""
     port = int(os.getenv('FLASK_PORT', 8085))
     app.run(
         host='0.0.0.0',
