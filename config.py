@@ -32,6 +32,14 @@ def required_db_uri():
         raise RuntimeError('Database configuration missing: set DATABASE_URL or DB_HOST/DB_NAME/DB_USER[/DB_PASSWORD/DB_PORT]')
     return uri
 
+def _parse_origins():
+    """Parse allowed origins from ALLOWED_ORIGINS or legacy CORS_ORIGINS."""
+    raw = os.getenv('ALLOWED_ORIGINS') or os.getenv('CORS_ORIGINS')
+    if not raw:
+        raw = 'https://rentkaro-frontend-807261496773.us-central1.run.app'
+    return [o.strip() for o in raw.split(',') if o.strip()]
+
+
 class Config:
     """Base configuration"""
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -40,11 +48,7 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
     
     # CORS Configuration
-    # Comma-separated list of allowed origins; defaults to the deployed frontend.
-    CORS_ORIGINS = os.getenv(
-        'ALLOWED_ORIGINS',
-        'https://rentkaro-frontend-807261496773.us-central1.run.app'
-    ).split(',')
+    CORS_ORIGINS = _parse_origins()
     
     # ZeptoMail Configuration
     ZEPTOMAIL_API_URL = os.getenv('ZEPTOMAIL_API_URL', 'https://api.zeptomail.in/v1.1/email')
