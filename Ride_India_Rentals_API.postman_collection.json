@@ -1,10 +1,44 @@
 {
   "info": {
     "name": "Ride India Rentals API",
-    "description": "Complete API collection for Ride India Rentals backend with all endpoints",
+    "description": "Complete API collection for Ride India Rentals backend with all endpoints. Uses MySQL (configure DB_* in .env) and Google Cloud Storage for uploads (set GCS_BUCKET and service account). Default local dev server: http://localhost:8085/api",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
+    {
+      "name": "Uploads",
+      "item": [
+        {
+          "name": "Upload Files (GCS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/uploads",
+              "host": ["{{base_url}}"],
+              "path": ["uploads"]
+            },
+            "description": "Upload files (images, pdfs) to Google Cloud Storage. Requires GCS_BUCKET and a valid service account. The API returns public URLs for uploaded files."
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "Authentication",
       "item": [
@@ -50,6 +84,7 @@
                   "path": ["auth", "register"]
                 }
               },
+              
               "status": "Created",
               "code": 201,
               "body": "{\n  \"message\": \"User registered successfully\",\n  \"user\": {\n    \"id\": 1,\n    \"email\": \"user@example.com\",\n    \"role\": \"customer\"\n  },\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}"
@@ -304,6 +339,16 @@
                   "key": "location",
                   "value": "Delhi",
                   "disabled": true
+                },
+                {
+                  "key": "start_date",
+                  "value": "2025-01-15",
+                  "disabled": true
+                },
+                {
+                  "key": "end_date",
+                  "value": "2025-01-20",
+                  "disabled": true
                 }
               ]
             },
@@ -341,7 +386,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"make\": \"Toyota\",\n  \"model\": \"Fortuner\",\n  \"year\": 2023,\n  \"registrationNumber\": \"DL-01-AB-1234\",\n  \"vin\": \"JTMHF18K1A0002765\",\n  \"vehicleType\": \"SUV\",\n  \"fuelType\": \"Diesel\",\n  \"transmission\": \"Manual\",\n  \"color\": \"White\",\n  \"mileage\": 5000,\n  \"seatingCapacity\": 7,\n  \"dailyRate\": 3500,\n  \"weeklyRate\": 23000,\n  \"monthlyRate\": 80000,\n  \"securityDeposit\": 10000,\n  \"location\": \"Delhi\",\n  \"latitude\": 28.7041,\n  \"longitude\": 77.1025,\n  \"insuranceNumber\": \"INS-123456\",\n  \"insuranceExpiry\": \"2025-12-31T00:00:00\",\n  \"registrationExpiry\": \"2026-12-31T00:00:00\",\n  \"pollutionCertificateNumber\": \"POLL-123456\",\n  \"pollutionExpiry\": \"2025-06-30T00:00:00\"\n}"
+              "raw": "{\n  \"brand\": \"Toyota\",\n  \"modelName\": \"Fortuner\",\n  \"year\": 2023,\n  \"registrationNumber\": \"DL-01-AB-1234\",\n  \"vin\": \"JTMHF18K1A0002765\",\n  \"vehicleType\": \"SUV\",\n  \"fuelType\": \"Diesel\",\n  \"transmission\": \"Manual\",\n  \"color\": \"White\",\n  \"mileage\": 5000,\n  \"seatingCapacity\": 7,\n  \"price_per_day\": 3500,\n  \"weeklyRate\": 23000,\n  \"monthlyRate\": 80000,\n  \"securityDeposit\": 10000,\n  \"location\": \"Delhi\",\n  \"latitude\": 28.7041,\n  \"longitude\": 77.1025,\n  \"insuranceNumber\": \"INS-123456\",\n  \"insuranceExpiry\": \"2025-12-31\",\n  \"registrationExpiry\": \"2026-12-31\",\n  \"pollutionCertificateNumber\": \"POLL-123456\",\n  \"pollutionExpiry\": \"2025-06-30\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/vehicles",
@@ -368,7 +413,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"dailyRate\": 4000,\n  \"weeklyRate\": 26000,\n  \"monthlyRate\": 90000,\n  \"location\": \"Bangalore\",\n  \"mileage\": 6000\n}"
+              "raw": "{\n  \"price_per_day\": 4000,\n  \"weeklyRate\": 26000,\n  \"monthlyRate\": 90000,\n  \"location\": \"Bangalore\",\n  \"mileage\": 6000\n}"
             },
             "url": {
               "raw": "{{base_url}}/vehicles/1",
@@ -466,6 +511,59 @@
       ]
     },
     {
+      "name": "Feedbacks",
+      "item": [
+        {
+          "name": "Submit Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"<booking-id>\",\n  \"rating\": 5,\n  \"comment\": \"Great experience!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/feedbacks",
+              "host": ["{{base_url}}"],
+              "path": ["feedbacks"]
+            },
+            "description": "Submit feedback for a completed booking"
+          },
+          "response": []
+        },
+        {
+          "name": "List Feedbacks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/feedbacks?agency_id=",
+              "host": ["{{base_url}}"],
+              "path": ["feedbacks"],
+              "query": [
+                {
+                  "key": "agency_id",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List feedbacks with optional filters"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Bookings",
       "item": [
         {
@@ -491,6 +589,25 @@
               ]
             },
             "description": "Get all bookings for authenticated user (as customer or agency)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/bookings/me",
+              "host": ["{{base_url}}"],
+              "path": ["bookings", "me"]
+            },
+            "description": "Alias for current user's bookings (customer or agency)"
           },
           "response": []
         },
@@ -529,7 +646,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"vehicleId\": 1,\n  \"agencyId\": 2,\n  \"startDate\": \"2025-01-15T10:00:00\",\n  \"endDate\": \"2025-01-20T18:00:00\",\n  \"pickupLocation\": \"Delhi Airport\",\n  \"dropoffLocation\": \"Gurugram\",\n  \"dailyRate\": 3500,\n  \"numberOfDays\": 5,\n  \"subtotal\": 17500,\n  \"tax\": 3150,\n  \"discount\": 0,\n  \"totalAmount\": 20650,\n  \"securityDeposit\": 10000,\n  \"notes\": \"Please deliver to the airport\"\n}"
+              "raw": "{\n  \"vehicleId\": 1,\n  \"agencyId\": 2,\n  \"startDate\": \"2025-01-15\",\n  \"endDate\": \"2025-01-20\",\n  \"pickupLocation\": \"Delhi Airport\",\n  \"dropoffLocation\": \"Gurugram\",\n  \"dailyRate\": 3500,\n  \"numberOfDays\": 5,\n  \"subtotal\": 17500,\n  \"tax\": 3150,\n  \"discount\": 0,\n  \"totalAmount\": 20650,\n  \"securityDeposit\": 10000,\n  \"notes\": \"Please deliver to the airport\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/bookings",
@@ -626,6 +743,25 @@
     {
       "name": "Agencies",
       "item": [
+        {
+          "name": "My Agency",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/agencies/me",
+              "host": ["{{base_url}}"],
+              "path": ["agencies", "me"]
+            },
+            "description": "Fetch agency profile for the authenticated user"
+          },
+          "response": []
+        },
         {
           "name": "Get All Agencies",
           "request": {
@@ -729,6 +865,106 @@
       "name": "KYC Verification",
       "item": [
         {
+          "name": "Get Agency KYC (me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/agency-kyc/me",
+              "host": ["{{base_url}}"],
+              "path": ["agency-kyc", "me"]
+            },
+            "description": "Get current agency KYC record"
+          },
+          "response": []
+        },
+        {
+          "name": "Upsert Agency KYC",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"panNumber\": \"AAAPA1234A\",\n  \"gstNumber\": \"18AABCU1234X1Z0\",\n  \"licenseNumber\": \"LIC-12345\",\n  \"panDocUrl\": \"https://example.com/pan.pdf\",\n  \"gstDocUrl\": \"https://example.com/gst.pdf\",\n  \"licenseDocUrl\": \"https://example.com/license.pdf\",\n  \"verificationStatus\": \"pending\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/agency-kyc",
+              "host": ["{{base_url}}"],
+              "path": ["agency-kyc"]
+            },
+            "description": "Create or update agency KYC for current agency"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Agency KYC",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"panNumber\": \"AAAPA1234A\",\n  \"gstNumber\": \"18AABCU1234X1Z0\",\n  \"licenseNumber\": \"LIC-12345\",\n  \"panDocUrl\": \"https://example.com/pan.pdf\",\n  \"gstDocUrl\": \"https://example.com/gst.pdf\",\n  \"licenseDocUrl\": \"https://example.com/license.pdf\",\n  \"verificationStatus\": \"pending\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/agency-kyc/{{kyc_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["agency-kyc", "{{kyc_id}}"]
+            },
+            "description": "Update agency KYC by id"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Agency KYC",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"panVerified\": true,\n  \"gstVerified\": true,\n  \"licenseVerified\": true,\n  \"verificationStatus\": \"verified\",\n  \"rejectionReason\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/agency-kyc/{{kyc_id}}/verify",
+              "host": ["{{base_url}}"],
+              "path": ["agency-kyc", "{{kyc_id}}", "verify"]
+            },
+            "description": "Verify agency KYC (admin)"
+          },
+          "response": []
+        },
+        {
           "name": "Get KYC Status",
           "request": {
             "method": "GET",
@@ -763,7 +999,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"aadhaarNumber\": \"1234-5678-9012\",\n  \"aadhaarDocumentUrl\": \"https://example.com/aadhaar.pdf\",\n  \"drivingLicenseNumber\": \"DL-0000-1234-5678\",\n  \"dlDocumentUrl\": \"https://example.com/dl.pdf\",\n  \"dlExpiryDate\": \"2026-12-31T00:00:00\",\n  \"panNumber\": \"AAAPA1234A\",\n  \"addressProofType\": \"passport\",\n  \"addressProofUrl\": \"https://example.com/passport.pdf\"\n}"
+              "raw": "{\n  \"aadhaarNumber\": \"1234-5678-9012\",\n  \"aadhaarDocumentUrl\": \"https://example.com/aadhaar.pdf\",\n  \"drivingLicenseNumber\": \"DL-0000-1234-5678\",\n  \"dlDocumentUrl\": \"https://example.com/dl.pdf\",\n  \"dlExpiryDate\": \"2026-12-31\",\n  \"panNumber\": \"AAAPA1234A\",\n  \"addressProofType\": \"passport\",\n  \"addressProofUrl\": \"https://example.com/passport.pdf\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/kyc/submit",
@@ -807,12 +1043,53 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:3000/api",
+      "value": "http://localhost:8085/api",
       "type": "string"
     },
     {
       "key": "access_token",
       "value": "",
+      "type": "string"
+    },
+    {
+      "key": "GCS_BUCKET",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "GCS_SERVICE_ACCOUNT_FILE",
+      "value": "app/leafy-guide-474311-u3-0328c0e70b35.json",
+      "type": "string"
+    },
+    {
+      "key": "DB_HOST",
+      "value": "34.47.179.240",
+      "type": "string"
+    },
+    {
+      "key": "DB_PORT",
+      "value": "3306",
+      "type": "string"
+    },
+    {
+      "key": "DB_NAME",
+      "value": "rentkaro",
+      "type": "string"
+    },
+    {
+      "key": "DB_USER",
+      "value": "rentkaro_user",
+      "type": "string"
+    },
+    {
+      "key": "DB_PASSWORD",
+      "value": "RentKaro@2025#Strong",
+      "type": "string"
+    }
+    ,
+    {
+      "key": "FRONTEND_BASE_URL",
+      "value": "http://localhost:3000",
       "type": "string"
     }
   ]

@@ -64,6 +64,133 @@ def get_agencies():
         }
     }), 200
 
+
+@agencies_bp.route('/me', methods=['GET'])
+@jwt_required()
+def get_my_agency():
+    """Return the agency record for the authenticated user."""
+    user_id = get_jwt_identity()
+    agency = Agency.query.filter_by(user_id=user_id).first()
+    if not agency:
+        return jsonify({'agency': None}), 200
+
+    user = User.query.get(agency.user_id)
+
+    return jsonify({
+        'agency': {
+            'id': agency.id,
+            'agencyName': agency.agency_name,
+            'businessType': agency.business_type,
+            'registrationNumber': agency.registration_number,
+            'gstNumber': agency.gst_number,
+            'panNumber': agency.pan_number,
+            'agencyPhone': agency.agency_phone,
+            'agencyEmail': agency.agency_email,
+            'address': agency.address,
+            'city': agency.city,
+            'state': agency.state,
+            'postalCode': agency.postal_code,
+            'latitude': agency.latitude,
+            'longitude': agency.longitude,
+            'isVerified': agency.is_verified,
+            'isActive': agency.is_active,
+            'totalVehicles': agency.total_vehicles,
+            'totalBookings': agency.total_bookings,
+            'totalEarnings': agency.total_earnings,
+            'averageRating': agency.average_rating,
+            'contact': {
+                'userId': user.id if user else None,
+                'email': user.email if user else None,
+                'name': user.profile.full_name if user and user.profile else ''
+            }
+        }
+    }), 200
+
+
+@agencies_bp.route('/me', methods=['PUT'])
+@jwt_required()
+def update_my_agency():
+    """Update the agency profile for the authenticated user."""
+    user_id = get_jwt_identity()
+    
+    agency = Agency.query.filter_by(user_id=user_id).first()
+    if not agency:
+        return jsonify({'error': 'Agency not found'}), 404
+    
+    is_multipart = request.content_type and 'multipart/form-data' in request.content_type
+    data = request.form if is_multipart else request.get_json() or {}
+    
+    try:
+        # Update basic fields
+        if 'agencyName' in data:
+            agency.agency_name = data['agencyName']
+        if 'businessType' in data:
+            agency.business_type = data['businessType']
+        if 'registrationNumber' in data:
+            agency.registration_number = data['registrationNumber']
+        if 'gstNumber' in data:
+            agency.gst_number = data['gstNumber']
+        if 'panNumber' in data:
+            agency.pan_number = data['panNumber']
+        if 'agencyPhone' in data:
+            agency.agency_phone = data['agencyPhone']
+        if 'agencyEmail' in data:
+            agency.agency_email = data['agencyEmail'].lower().strip() if data['agencyEmail'] else None
+        if 'address' in data:
+            agency.address = data['address']
+        if 'city' in data:
+            agency.city = data['city']
+        if 'state' in data:
+            agency.state = data['state']
+        if 'postalCode' in data:
+            agency.postal_code = data['postalCode']
+        if 'latitude' in data:
+            agency.latitude = data['latitude']
+        if 'longitude' in data:
+            agency.longitude = data['longitude']
+        
+        # Handle file uploads if multipart
+        if is_multipart:
+            upload_folder = get_upload_folder()
+            
+            gst_doc = request.files.get('gstDoc')
+            if gst_doc and gst_doc.filename:
+                if not allowed_file(gst_doc.filename):
+                    return jsonify({'error': 'Invalid file type for gstDoc'}), 400
+                ext = gst_doc.filename.rsplit('.', 1)[1].lower()
+                filename = f"{user_id}_gstDoc_{uuid.uuid4().hex}.{ext}"
+                filepath = os.path.join(upload_folder, secure_filename(filename))
+                gst_doc.save(filepath)
+                agency.gst_doc_url = f"/uploads/agencies/{filename}"
+            
+            business_photo = request.files.get('businessPhoto')
+            if business_photo and business_photo.filename:
+                if not allowed_file(business_photo.filename):
+                    return jsonify({'error': 'Invalid file type for businessPhoto'}), 400
+                ext = business_photo.filename.rsplit('.', 1)[1].lower()
+                filename = f"{user_id}_businessPhoto_{uuid.uuid4().hex}.{ext}"
+                filepath = os.path.join(upload_folder, secure_filename(filename))
+                business_photo.save(filepath)
+                agency.business_photo_url = f"/uploads/agencies/{filename}"
+        
+        # Handle bank details if provided
+        bank_data = data.get('bankDetails')
+        if bank_data and isinstance(bank_data, dict):
+            if 'accountNumber' in bank_data:
+                agency.bank_account_number = bank_data['accountNumber']
+            if 'ifscCode' in bank_data:
+                agency.bank_ifsc_code = bank_data['ifscCode']
+            if 'accountHolderName' in bank_data:
+                agency.bank_account_holder_name = bank_data['accountHolderName']
+        
+        db.session.commit()
+        
+        return jsonify({'message': 'Agency profile updated successfully'}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 @agencies_bp.route('/<agency_id>', methods=['GET'])
 def get_agency(agency_id):
     """Get agency details"""

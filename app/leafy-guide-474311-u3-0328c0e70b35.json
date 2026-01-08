@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "leafy-guide-474311-u3",
+  "private_key_id": "0328c0e70b3539a741d8fb7a859003b58f7d6f46",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDDChcn+mo/7bMH\nyskxDDFaIkg5Igh4QHx8QqIDWBj6cRfx8OgTuNihXQtXyvnQ6mMbBO+WV+yxh5fq\nR0Urd08CMgeHZYsd+BN90LGIVHVNG+1jxhKI05JYWsuslZadAgshhy1uNljlhpty\nFmVo2toDc7JZAdjM/LtxzLPNtO5MWXqMo5DKldNDbr9Y3jmgyokhJ6fOjQM3VU+6\nRt+5ZQ3+WQUzEO7b97+cSWAmE5bXtDLLpbWNroJIsCDn4p+Ml6RRyOXZlhfWGVoQ\nky0lseCzcyX4+rIgM+f8kQFFj9QOCeBeLqrAftNw9uYMOloC2qUY3uWOIX4Bg+/G\ny8H/BQMhAgMBAAECggEAEiOLGcW5Qe7KWqwqX+xhXp+XlfCrVvuwWCIeTS9RS2Ff\nN7oO616ijwdHOcf/ycUyqF2iJppQwgX5Q+mS7kLvTyX1+0qfUI80yNuy1xn7ussh\nHclbCeybTKpNDOTwl/OLs3eN6xUU2WvWYxrgHYtVAUMuUAbS8eWDTUcbZcMw8lqq\nGnncEdizCeJI/qjySo/bp2xvRyGquYnFenRzmdEVtGu9M1Wrb6i+ntlDqJcFiGzc\nRN06e+jMoRw1raPyy/+78D7Iv2JCCbmTei7wvOTas54pJmZxbAWJqaJeAE7n4zbz\nGKr2mOQFXHWfDf7/lV/S/8LaL2EyapKGZEDZ/RQtUQKBgQD+AUYQCxJTt2hQsUcn\nnqO21bxM2igSjhpw8BilNVYaZkLbLqzoHeC86Ie4e7w3wIS5aCADxNDTDiLYVC0G\nB9MeeuamPCXlte/+lDsVjNKDhnUWcgKyhljjKYQxZVLyfn4bHNs1ajfrrXHR9VFL\n64tVGfZEOUWIOtQX6GtDfNEL7QKBgQDEkkFMAaJKTm/nSSGCgmsbaFrRtiZymwM3\np95BTxDHF9ZA56rESDnGsuvYZLdMTAyKqbpkU+vmgbWdLLHtWynq2qzy3vXpS6ZD\nAkURmQ7CQP2xQIHQNCEXQYNbIAAN848ImZGm0jKmY5a9VIZI63Fm8jA+yTAOUJSr\ncLNPrgD1hQKBgQDb8+Bm3h+FrQnA7nKuZVphZh5D8pnGz5Un/VFqJpCkFa+JO5bw\n/YZyL23vm/51zNlh8D/g45rtWI1mBSZj1XzFJSn8A5PRokXrjxLG64YT7OgRgrLB\nQ0NPmtDlMVets0miUs+kJpG8HRq19JfshVDHZc7ybyG+AStOdK4F59ziVQKBgQC6\ny9ktJyhXwG3qtb4YTWMG6oXTX2rt4YyPKQC1wzLIX0iE6SGH4LK2tXQVcLAW2vXY\nFy4/BNjZdU1mjQCP89/DhAZxzZqWFgNrDg8gh/hUdHogJJK3jbIcbW8r+x7SIy87\nFuQoSPtEzsKCLH5ncQWUtHVQVNNL5xtAR5q+DzZuGQKBgGKp8Z8TMdLSIbHsUoa+\nwrGPk8nX8HmK4sz7ucVF4fUsalCLocC9EunGFJUQOtYnOwzguoetI+RquGdfHYMv\nCLsBjOTnTej7FXOQx/DP0AKAP5iEayQQl1EI/EJjR1d31P63EHyoGobilRC0uP/r\n/wsBA+DxTUpenMKuTURxR7Ji\n-----END PRIVATE KEY-----\n",
+  "client_email": "rentkaro-gcs-sa@leafy-guide-474311-u3.iam.gserviceaccount.com",
+  "client_id": "101266438243222679367",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/rentkaro-gcs-sa%40leafy-guide-474311-u3.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

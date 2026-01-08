@@ -3,16 +3,22 @@
 
 import os
 from dotenv import load_dotenv
-from app import create_app
 
+# Load environment variables before importing the app so config.py reads them
 load_dotenv()
 
-app = create_app()
+from app import create_app
 
-if __name__ == '__main__':
-    port = int(os.getenv('FLASK_PORT', 8080))
+def main():
+    """Create app and run when executed directly."""
+    app = create_app()
+    port = int(os.getenv('FLASK_PORT', 8085))
     app.run(
         host='0.0.0.0',
         port=port,
         debug=os.getenv('FLASK_ENV') == 'development'
     )
+
+
+if __name__ == '__main__':
+    main()

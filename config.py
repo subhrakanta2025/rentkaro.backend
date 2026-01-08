@@ -1,5 +1,36 @@
 import os
+import urllib.parse
 from datetime import timedelta
+
+
+def build_db_uri_from_env(default=None):
+    """Construct SQLAlchemy DB URI from discrete env vars if DATABASE_URL not set.
+
+    Supports MySQL credentials provided as DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD.
+    """
+    database_url = os.getenv('DATABASE_URL')
+    if database_url:
+        return database_url
+
+    host = os.getenv('DB_HOST')
+    name = os.getenv('DB_NAME')
+    user = os.getenv('DB_USER')
+    password = os.getenv('DB_PASSWORD')
+    port = os.getenv('DB_PORT', '3306')
+
+    if host and name and user:
+        # Percent-encode password to handle special chars
+        encoded_pw = urllib.parse.quote_plus(password or '')
+        return f"mysql+pymysql://{user}:{encoded_pw}@{host}:{port}/{name}"
+
+    return default
+
+
+def required_db_uri():
+    uri = build_db_uri_from_env()
+    if not uri:
+        raise RuntimeError('Database configuration missing: set DATABASE_URL or DB_HOST/DB_NAME/DB_USER[/DB_PASSWORD/DB_PORT]')
+    return uri
 
 class Config:
     """Base configuration"""
@@ -18,23 +49,34 @@ class Config:
     
     # OTP Configuration
     OTP_EXPIRY_MINUTES = 10
+    # SQLAlchemy engine options to improve connection reliability with remote MySQL
+    # Enable pool_pre_ping to detect and recycle stale connections.
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': int(os.getenv('SQLALCHEMY_POOL_RECYCLE', '280')),
+        'pool_size': int(os.getenv('SQLALCHEMY_POOL_SIZE', '10')),
+        'pool_timeout': int(os.getenv('SQLALCHEMY_POOL_TIMEOUT', '30')),
+        'connect_args': {
+            'connect_timeout': int(os.getenv('DB_CONNECT_TIMEOUT', '10'))
+        }
+    }
 
 class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///ride_rentals.db')
     SQLALCHEMY_ECHO = True
+    SQLALCHEMY_DATABASE_URI = required_db_uri()
 
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = required_db_uri()
     SQLALCHEMY_ECHO = False
 
 class TestingConfig(Config):
     """Testing configuration"""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_DATABASE_URI = required_db_uri()
 
 def get_config():
     """Get the appropriate configuration"""
