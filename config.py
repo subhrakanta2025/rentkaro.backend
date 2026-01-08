@@ -40,7 +40,11 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
     
     # CORS Configuration
-    CORS_ORIGINS = '*'  # Allow all origins
+    # Comma-separated list of allowed origins; defaults to the deployed frontend.
+    CORS_ORIGINS = os.getenv(
+        'ALLOWED_ORIGINS',
+        'https://rentkaro-frontend-807261496773.us-central1.run.app'
+    ).split(',')
     
     # ZeptoMail Configuration
     ZEPTOMAIL_API_URL = os.getenv('ZEPTOMAIL_API_URL', 'https://api.zeptomail.in/v1.1/email')
