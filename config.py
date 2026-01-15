@@ -36,7 +36,7 @@ def _parse_origins():
     """Parse allowed origins from ALLOWED_ORIGINS or legacy CORS_ORIGINS."""
     raw = os.getenv('ALLOWED_ORIGINS') or os.getenv('CORS_ORIGINS')
     if not raw:
-        raw = 'https://rentkaro-frontend-807261496773.us-central1.run.app'
+        raw = 'https://rentkaro-frontend-807261496773.us-central1.run.app, https://www.rentkaro.online, https://rentkaro.online,https://app.rentkaro.online'
     return [o.strip() for o in raw.split(',') if o.strip()]
 
 
