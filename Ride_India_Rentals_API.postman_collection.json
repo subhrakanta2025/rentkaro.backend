@@ -10,1087 +10,391 @@
       "item": [
         {
           "name": "Upload Files (GCS)",
-          "request": {
-            "method": "POST",
-            "header": [
+          {
+            "info": {
+              "name": "Ride India Rentals API",
+              "description": "Complete API collection for Ride India Rentals backend. Default local dev server: http://localhost:8085/api. Configure DB_*, ALLOWED_ORIGINS, JWT/SECRET keys, and optional GCS/ZeptoMail/Razorpay envs in Cloud Run or .env.",
+              "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+            },
+            "item": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "files",
-                  "type": "file",
-                  "src": ""
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/uploads",
-              "host": ["{{base_url}}"],
-              "path": ["uploads"]
-            },
-            "description": "Upload files (images, pdfs) to Google Cloud Storage. Requires GCS_BUCKET and a valid service account. The API returns public URLs for uploaded files."
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Authentication",
-      "item": [
-        {
-          "name": "Register",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"John Doe\",\n  \"phone\": \"+91-9876543210\",\n  \"role\": \"customer\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/register",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "register"]
-            },
-            "description": "Register a new user account"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
+                "name": "Health",
+                "item": [
                   {
-                    "key": "Content-Type",
-                    "value": "application/json"
+                    "name": "Health Check",
+                    "request": {
+                      "method": "GET",
+                      "url": {
+                        "raw": "{{base_url}}/health",
+                        "host": ["{{base_url}}"],
+                        "path": ["health"]
+                      },
+                      "description": "Basic liveness endpoint"
+                    },
+                    "response": []
                   }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"John Doe\",\n  \"phone\": \"+91-9876543210\",\n  \"role\": \"customer\"\n}"
-                },
-                "url": {
-                  "raw": "{{base_url}}/auth/register",
-                  "host": ["{{base_url}}"],
-                  "path": ["auth", "register"]
-                }
+                ]
               },
-              
-              "status": "Created",
-              "code": 201,
-              "body": "{\n  \"message\": \"User registered successfully\",\n  \"user\": {\n    \"id\": 1,\n    \"email\": \"user@example.com\",\n    \"role\": \"customer\"\n  },\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}"
-            }
-          ]
-        },
-        {
-          "name": "Login",
-          "request": {
-            "method": "POST",
-            "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "login"]
-            },
-            "description": "Login with email and password"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
+                "name": "Authentication",
+                "item": [
                   {
-                    "key": "Content-Type",
-                    "value": "application/json"
+                    "name": "Register",
+                    "request": {
+                      "method": "POST",
+                      "header": [
+                        { "key": "Content-Type", "value": "application/json" }
+                      ],
+                      "body": {
+                        "mode": "raw",
+                        "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"fullName\": \"John Doe\",\n  \"phone\": \"+91-9876543210\",\n  \"role\": \"customer\"\n}"
+                      },
+                      "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth","register"] },
+                      "description": "Register a new user and send OTP to email"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Activate Account (OTP)",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\"\n}" },
+                      "url": { "raw": "{{base_url}}/auth/activate", "host": ["{{base_url}}"], "path": ["auth","activate"] },
+                      "description": "Activate account with OTP sent during registration"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Resend OTP",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\"\n}" },
+                      "url": { "raw": "{{base_url}}/auth/resend-otp", "host": ["{{base_url}}"], "path": ["auth","resend-otp"] },
+                      "description": "Resend activation OTP"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Login",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}" },
+                      "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth","login"] },
+                      "description": "Login with email/password"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Login with Google",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"idToken\": \"<google-id-token>\"\n}" },
+                      "url": { "raw": "{{base_url}}/auth/login/google", "host": ["{{base_url}}"], "path": ["auth","login","google"] },
+                      "description": "Login/register using Google ID token"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Forgot Password",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\"\n}" },
+                      "url": { "raw": "{{base_url}}/auth/forgot-password", "host": ["{{base_url}}"], "path": ["auth","forgot-password"] },
+                      "description": "Send password reset link"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Resend Reset Password",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\"\n}" },
+                      "url": { "raw": "{{base_url}}/auth/resend-reset-password", "host": ["{{base_url}}"], "path": ["auth","resend-reset-password"] },
+                      "description": "Resend reset link"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Reset Password",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"token\": \"<reset-token>\",\n  \"password\": \"new-password\"\n}" },
+                      "url": { "raw": "{{base_url}}/auth/reset-password", "host": ["{{base_url}}"], "path": ["auth","reset-password"] },
+                      "description": "Reset password using emailed token"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Send OTP Email (generic)",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\"\n}" },
+                      "url": { "raw": "{{base_url}}/auth/send-otp-email", "host": ["{{base_url}}"], "path": ["auth","send-otp-email"] },
+                      "description": "Send OTP to email (uses in-memory cache)"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Verify Email OTP",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\"\n}" },
+                      "url": { "raw": "{{base_url}}/auth/verify-email-otp", "host": ["{{base_url}}"], "path": ["auth","verify-email-otp"] },
+                      "description": "Verify OTP sent via send-otp-email"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Get Current User",
+                    "request": {
+                      "method": "GET",
+                      "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                      "url": { "raw": "{{base_url}}/auth/me", "host": ["{{base_url}}"], "path": ["auth","me"] },
+                      "description": "Get authenticated user"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Refresh Token",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                      "url": { "raw": "{{base_url}}/auth/refresh", "host": ["{{base_url}}"], "path": ["auth","refresh"] },
+                      "description": "Refresh JWT"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Logout",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                      "url": { "raw": "{{base_url}}/auth/logout", "host": ["{{base_url}}"], "path": ["auth","logout"] },
+                      "description": "Logout (client deletes token)"
+                    },
+                    "response": []
                   }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
-                },
-                "url": {
-                  "raw": "{{base_url}}/auth/login",
-                  "host": ["{{base_url}}"],
-                  "path": ["auth", "login"]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "body": "{\n  \"message\": \"Login successful\",\n  \"user\": {\n    \"id\": 1,\n    \"email\": \"user@example.com\",\n    \"role\": \"customer\"\n  },\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}"
-            }
-          ]
-        },
-        {
-          "name": "Activate Account with OTP",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/activate",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "activate"]
-            },
-            "description": "Activate account with OTP received in email"
-          },
-          "response": []
-        },
-        {
-          "name": "Resend OTP",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/resend-otp",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "resend-otp"]
-            },
-            "description": "Resend OTP to email (if first one expired)"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Current User",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/auth/me",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "me"]
-            },
-            "description": "Get current authenticated user info"
-          },
-          "response": []
-        },
-        {
-          "name": "Logout",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/auth/logout",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "logout"]
-            },
-            "description": "Logout user (client should delete token)"
-          },
-          "response": []
-        },
-        {
-          "name": "Refresh Token",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/auth/refresh",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "refresh"]
-            },
-            "description": "Refresh JWT access token"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Users",
-      "item": [
-        {
-          "name": "Get Profile",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/users/profile",
-              "host": ["{{base_url}}"],
-              "path": ["users", "profile"]
-            },
-            "description": "Get authenticated user's profile"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Profile",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fullName\": \"John Doe Updated\",\n  \"phone\": \"+91-9876543210\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/users/profile",
-              "host": ["{{base_url}}"],
-              "path": ["users", "profile"]
-            },
-            "description": "Update user profile information"
-          },
-          "response": []
-        },
-        {
-          "name": "Get User by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/users/1",
-              "host": ["{{base_url}}"],
-              "path": ["users", "1"]
-            },
-            "description": "Get public user information by ID"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Vehicles",
-      "item": [
-        {
-          "name": "Get All Vehicles",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/vehicles?page=1&per_page=12&type=SUV&location=Delhi",
-              "host": ["{{base_url}}"],
-              "path": ["vehicles"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "per_page",
-                  "value": "12"
-                },
-                {
-                  "key": "type",
-                  "value": "SUV",
-                  "disabled": true
-                },
-                {
-                  "key": "location",
-                  "value": "Delhi",
-                  "disabled": true
-                },
-                {
-                  "key": "start_date",
-                  "value": "2025-01-15",
-                  "disabled": true
-                },
-                {
-                  "key": "end_date",
-                  "value": "2025-01-20",
-                  "disabled": true
-                }
-              ]
-            },
-            "description": "List all available vehicles with pagination and filters"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Vehicle Details",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/vehicles/1",
-              "host": ["{{base_url}}"],
-              "path": ["vehicles", "1"]
-            },
-            "description": "Get detailed information about a specific vehicle"
-          },
-          "response": []
-        },
-        {
-          "name": "Create Vehicle",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "name": "Users",
+                "item": [
+                  {
+                    "name": "Get Profile",
+                    "request": {
+                      "method": "GET",
+                      "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+                      "url": { "raw": "{{base_url}}/users/profile", "host": ["{{base_url}}"], "path": ["users","profile"] },
+                      "description": "Authenticated user profile"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Update Profile",
+                    "request": {
+                      "method": "PUT",
+                      "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"John Doe Updated\",\n  \"phone\": \"+91-9876543210\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\"\n}" },
+                      "url": { "raw": "{{base_url}}/users/profile", "host": ["{{base_url}}"], "path": ["users","profile"] },
+                      "description": "Update profile (avatar ignored if locked)"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Get User by ID (public)",
+                    "request": {
+                      "method": "GET",
+                      "url": { "raw": "{{base_url}}/users/1", "host": ["{{base_url}}"], "path": ["users","1"] },
+                      "description": "Public user info"
+                    },
+                    "response": []
+                  }
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"brand\": \"Toyota\",\n  \"modelName\": \"Fortuner\",\n  \"year\": 2023,\n  \"registrationNumber\": \"DL-01-AB-1234\",\n  \"vin\": \"JTMHF18K1A0002765\",\n  \"vehicleType\": \"SUV\",\n  \"fuelType\": \"Diesel\",\n  \"transmission\": \"Manual\",\n  \"color\": \"White\",\n  \"mileage\": 5000,\n  \"seatingCapacity\": 7,\n  \"price_per_day\": 3500,\n  \"weeklyRate\": 23000,\n  \"monthlyRate\": 80000,\n  \"securityDeposit\": 10000,\n  \"location\": \"Delhi\",\n  \"latitude\": 28.7041,\n  \"longitude\": 77.1025,\n  \"insuranceNumber\": \"INS-123456\",\n  \"insuranceExpiry\": \"2025-12-31\",\n  \"registrationExpiry\": \"2026-12-31\",\n  \"pollutionCertificateNumber\": \"POLL-123456\",\n  \"pollutionExpiry\": \"2025-06-30\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/vehicles",
-              "host": ["{{base_url}}"],
-              "path": ["vehicles"]
-            },
-            "description": "Create a new vehicle listing"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Vehicle",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "name": "Vehicles",
+                "item": [
+                  {
+                    "name": "Get Vehicles (filters)",
+                    "request": {
+                      "method": "GET",
+                      "url": {
+                        "raw": "{{base_url}}/vehicles?page=1&per_page=12&q=scooter&location=Delhi&wheelers=2&favorite=true&start_date=2025-01-15T10:00:00&end_date=2025-01-17T10:00:00",
+                        "host": ["{{base_url}}"],
+                        "path": ["vehicles"],
+                        "query": [
+                          { "key": "page", "value": "1" },
+                          { "key": "per_page", "value": "12" },
+                          { "key": "q", "value": "scooter", "disabled": true },
+                          { "key": "location", "value": "Delhi", "disabled": true },
+                          { "key": "wheelers", "value": "2", "disabled": true },
+                          { "key": "favorite", "value": "true", "disabled": true },
+                          { "key": "start_date", "value": "2025-01-15T10:00:00", "disabled": true },
+                          { "key": "end_date", "value": "2025-01-17T10:00:00", "disabled": true }
+                        ]
+                      },
+                      "description": "List available vehicles. Optional filters: q, location, vehicle_type, wheelers (2/4), favorite (auth), start_date/end_date or pickup/drop dates."
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Get Vehicle Details",
+                    "request": { "method": "GET", "url": { "raw": "{{base_url}}/vehicles/1", "host": ["{{base_url}}"], "path": ["vehicles","1"] }, "description": "Vehicle by id" },
+                    "response": []
+                  },
+                  {
+                    "name": "Create Vehicle",
+                    "request": {
+                      "method": "POST",
+                      "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                      "body": {
+                        "mode": "raw",
+                        "raw": "{\n  \"make\": \"Honda\",\n  \"model\": \"Activa\",\n  \"year\": 2024,\n  \"vehicleType\": \"scooter\",\n  \"fuelType\": \"Petrol\",\n  \"dailyRate\": 550,\n  \"registrationNumber\": \"KA01AB1234\",\n  \"vin\": \"VIN123\",\n  \"transmission\": \"Automatic\",\n  \"color\": \"Red\",\n  \"mileage\": 1200,\n  \"seatingCapacity\": 2,\n  \"securityDeposit\": 1500,\n  \"weeklyRate\": 3200,\n  \"monthlyRate\": 9000,\n  \"location\": \"Bangalore\",\n  \"latitude\": 12.97,\n  \"longitude\": 77.59,\n  \"insuranceNumber\": \"INS-11\",\n  \"insuranceExpiry\": \"2025-12-31\",\n  \"registrationExpiry\": \"2026-12-31\",\n  \"pollutionCertificateNumber\": \"PUC-22\",\n  \"pollutionExpiry\": \"2025-06-30\",\n  \"images\": [{\n    \"imageUrl\": \"https://example.com/img.jpg\",\n    \"imageType\": \"front\",\n    \"isPrimary\": true\n  }],\n  \"documents\": [{\n    \"documentType\": \"insurance\",\n    \"documentUrl\": \"https://example.com/ins.pdf\",\n    \"expiryDate\": \"2025-12-31\",\n    \"verified\": false\n  }]\n}"
+                      },
+                      "url": { "raw": "{{base_url}}/vehicles", "host": ["{{base_url}}"], "path": ["vehicles"] },
+                      "description": "Create vehicle (owner or agency). Required: make/model/year/vehicleType/fuelType/dailyRate/registrationNumber."
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Update Vehicle",
+                    "request": {
+                      "method": "PUT",
+                      "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"color\": \"Black\",\n  \"dailyRate\": 600,\n  \"location\": \"Hyderabad\",\n  \"images\": [],\n  \"documents\": []\n}" },
+                      "url": { "raw": "{{base_url}}/vehicles/1", "host": ["{{base_url}}"], "path": ["vehicles","1"] },
+                      "description": "Update fields/images/docs (replaces images/docs when provided)"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Update Availability",
+                    "request": {
+                      "method": "PUT",
+                      "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ],
+                      "body": { "mode": "raw", "raw": "{\n  \"isAvailable\": true\n}" },
+                      "url": { "raw": "{{base_url}}/vehicles/1/availability", "host": ["{{base_url}}"], "path": ["vehicles","1","availability"] },
+                      "description": "Toggle availability"
+                    },
+                    "response": []
+                  },
+                  {
+                    "name": "Delete Vehicle",
+                    "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/vehicles/1", "host": ["{{base_url}}"], "path": ["vehicles","1"] }, "description": "Delete owned vehicle" },
+                    "response": []
+                  },
+                  {
+                    "name": "Add Favorite",
+                    "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/vehicles/1/favorite", "host": ["{{base_url}}"], "path": ["vehicles","1","favorite"] }, "description": "Mark vehicle favorite" },
+                    "response": []
+                  },
+                  {
+                    "name": "Remove Favorite",
+                    "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/vehicles/1/favorite", "host": ["{{base_url}}"], "path": ["vehicles","1","favorite"] }, "description": "Remove from favorites" },
+                    "response": []
+                  },
+                  {
+                    "name": "Owner Vehicles",
+                    "request": { "method": "GET", "url": { "raw": "{{base_url}}/vehicles/owner/1", "host": ["{{base_url}}"], "path": ["vehicles","owner","1"] }, "description": "Public list by owner" },
+                    "response": []
+                  }
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"price_per_day\": 4000,\n  \"weeklyRate\": 26000,\n  \"monthlyRate\": 90000,\n  \"location\": \"Bangalore\",\n  \"mileage\": 6000\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/vehicles/1",
-              "host": ["{{base_url}}"],
-              "path": ["vehicles", "1"]
-            },
-            "description": "Update vehicle information"
-          },
-          "response": []
-        },
-        {
-          "name": "Delete Vehicle",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/vehicles/1",
-              "host": ["{{base_url}}"],
-              "path": ["vehicles", "1"]
-            },
-            "description": "Delete a vehicle listing"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Availability",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "name": "Bookings",
+                "item": [
+                  { "name": "Get Bookings", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/bookings?status=confirmed", "host": ["{{base_url}}"], "path": ["bookings"], "query": [ { "key": "status", "value": "confirmed", "disabled": true } ] }, "description": "Bookings for user/agency (filters: status, vehicle_type, q, start_date, end_date, limit)" }, "response": [] },
+                  { "name": "My Bookings", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/bookings/me", "host": ["{{base_url}}"], "path": ["bookings","me"] } }, "response": [] },
+                  { "name": "Get Booking", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/bookings/1", "host": ["{{base_url}}"], "path": ["bookings","1"] } }, "response": [] },
+                  { "name": "Check Availability", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/bookings/availability?vehicle_id=1&start_date=2025-01-15T10:00:00&end_date=2025-01-16T10:00:00", "host": ["{{base_url}}"], "path": ["bookings","availability"], "query": [ { "key": "vehicle_id", "value": "1" }, { "key": "start_date", "value": "2025-01-15T10:00:00" }, { "key": "end_date", "value": "2025-01-16T10:00:00" } ] }, "description": "Check conflicts before booking" }, "response": [] },
+                  { "name": "Create Booking", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"vehicleId\": 1,\n  \"agencyId\": 2,\n  \"startDate\": \"2025-01-15T10:00:00\",\n  \"endDate\": \"2025-01-17T10:00:00\",\n  \"pickupLocation\": \"Hyderabad Airport\",\n  \"dropoffLocation\": \"Hyderabad Airport\",\n  \"dailyRate\": 800,\n  \"totalAmount\": 1600,\n  \"numberOfDays\": 2,\n  \"securityDeposit\": 2000,\n  \"notes\": \"Handle with care\"\n}" }, "url": { "raw": "{{base_url}}/bookings", "host": ["{{base_url}}"], "path": ["bookings"] }, "description": "Create booking (requires auth)" }, "response": [] },
+                  { "name": "Update Booking Status (agency)", "request": { "method": "PUT", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"status\": \"completed\"\n}" }, "url": { "raw": "{{base_url}}/bookings/1/status", "host": ["{{base_url}}"], "path": ["bookings","1","status"] } }, "response": [] },
+                  { "name": "Update Payment Status (customer)", "request": { "method": "PUT", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"paymentStatus\": \"completed\"\n}" }, "url": { "raw": "{{base_url}}/bookings/1/payment-status", "host": ["{{base_url}}"], "path": ["bookings","1","payment-status"] } }, "response": [] },
+                  { "name": "Cancel Booking", "request": { "method": "PUT", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/bookings/1/cancel", "host": ["{{base_url}}"], "path": ["bookings","1","cancel"] } }, "response": [] },
+                  { "name": "Create Razorpay Order", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"bookingId\": 1,\n  \"amountPaise\": 250000\n}" }, "url": { "raw": "{{base_url}}/bookings/payment/order", "host": ["{{base_url}}"], "path": ["bookings","payment","order"] }, "description": "Creates Razorpay order; amountPaise overrides total" }, "response": [] },
+                  { "name": "Verify Razorpay Payment", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"bookingId\": 1,\n  \"razorpay_order_id\": \"order_ABC\",\n  \"razorpay_payment_id\": \"pay_123\",\n  \"razorpay_signature\": \"sig_hash\",\n  \"email\": \"user@example.com\",\n  \"contact\": \"+919999999999\",\n  \"method\": \"card\"\n}" }, "url": { "raw": "{{base_url}}/bookings/payment/verify", "host": ["{{base_url}}"], "path": ["bookings","payment","verify"] }, "description": "Verifies signature, marks booking paid" }, "response": [] },
+                  { "name": "Fail Payment", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"bookingId\": 1,\n  \"razorpay_order_id\": \"order_ABC\",\n  \"razorpay_payment_id\": \"pay_FAIL\"\n}" }, "url": { "raw": "{{base_url}}/bookings/payment/fail", "host": ["{{base_url}}"], "path": ["bookings","payment","fail"] }, "description": "Mark payment failed and cancel booking" }, "response": [] }
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"isAvailable\": false\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/vehicles/1/availability",
-              "host": ["{{base_url}}"],
-              "path": ["vehicles", "1", "availability"]
-            },
-            "description": "Update vehicle availability status"
-          },
-          "response": []
-        },
-        {
-          "name": "Delete Vehicle",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/vehicles/1",
-              "host": ["{{base_url}}"],
-              "path": ["vehicles", "1"]
-            },
-            "description": "Delete a vehicle listing"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Owner Vehicles",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/vehicles/owner/1",
-              "host": ["{{base_url}}"],
-              "path": ["vehicles", "owner", "1"]
-            },
-            "description": "Get all vehicles owned by a specific user"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Feedbacks",
-      "item": [
-        {
-          "name": "Submit Feedback",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "name": "Agencies",
+                "item": [
+                  { "name": "Get Agencies", "request": { "method": "GET", "url": { "raw": "{{base_url}}/agencies?page=1&per_page=10&city=Delhi", "host": ["{{base_url}}"], "path": ["agencies"], "query": [ { "key": "page", "value": "1" }, { "key": "per_page", "value": "10" }, { "key": "city", "value": "Delhi", "disabled": true } ] }, "description": "Verified & active agencies" }, "response": [] },
+                  { "name": "Get Agency", "request": { "method": "GET", "url": { "raw": "{{base_url}}/agencies/1", "host": ["{{base_url}}"], "path": ["agencies","1"] }, "description": "Agency detail" }, "response": [] },
+                  { "name": "Create Agency", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"agencyName\": \"Premium Car Rentals\",\n  \"businessType\": \"Individual\",\n  \"registrationNumber\": \"REG-123456\",\n  \"gstNumber\": \"18AABCU1234X1Z0\",\n  \"panNumber\": \"AAAPA1234A\",\n  \"agencyPhone\": \"+91-9876543210\",\n  \"agencyEmail\": \"info@premiumrentals.com\",\n  \"address\": \"123 Main Street\",\n  \"city\": \"Delhi\",\n  \"state\": \"Delhi\",\n  \"postalCode\": \"110001\",\n  \"latitude\": 28.7041,\n  \"longitude\": 77.1025\n}" }, "url": { "raw": "{{base_url}}/agencies", "host": ["{{base_url}}"], "path": ["agencies"] }, "description": "Create agency (multipart supported for gstDoc/businessPhoto)" }, "response": [] },
+                  { "name": "Update Agency", "request": { "method": "PUT", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"agencyPhone\": \"+91-9876543211\",\n  \"agencyEmail\": \"contact@premiumrentals.com\",\n  \"bankDetails\": {\n    \"accountNumber\": \"1234567890\",\n    \"ifscCode\": \"HDFC000123\",\n    \"accountHolderName\": \"John Doe\"\n  }\n}" }, "url": { "raw": "{{base_url}}/agencies/1", "host": ["{{base_url}}"], "path": ["agencies","1"] } }, "response": [] },
+                  { "name": "My Agency", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/agencies/me", "host": ["{{base_url}}"], "path": ["agencies","me"] } }, "response": [] },
+                  { "name": "Update My Agency (JSON or multipart)", "request": { "method": "PUT", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "body": { "mode": "formdata", "formdata": [ { "key": "agencyName", "value": "Premium Cars" }, { "key": "agencyEmail", "value": "owner@example.com" }, { "key": "gstDoc", "type": "file", "src": "" }, { "key": "businessPhoto", "type": "file", "src": "" } ] }, "url": { "raw": "{{base_url}}/agencies/me", "host": ["{{base_url}}"], "path": ["agencies","me"] }, "description": "Supports multipart (gstDoc, businessPhoto) or JSON body" }, "response": [] },
+                  { "name": "Agency Earnings", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/agencies/earnings?range=month", "host": ["{{base_url}}"], "path": ["agencies","earnings"], "query": [ { "key": "range", "value": "month", "disabled": true } ] }, "description": "Analytics for agency owner (range=week|month|year)" }, "response": [] }
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bookingId\": \"<booking-id>\",\n  \"rating\": 5,\n  \"comment\": \"Great experience!\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/feedbacks",
-              "host": ["{{base_url}}"],
-              "path": ["feedbacks"]
-            },
-            "description": "Submit feedback for a completed booking"
-          },
-          "response": []
-        },
-        {
-          "name": "List Feedbacks",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/feedbacks?agency_id=",
-              "host": ["{{base_url}}"],
-              "path": ["feedbacks"],
-              "query": [
-                {
-                  "key": "agency_id",
-                  "value": "",
-                  "disabled": true
-                }
-              ]
-            },
-            "description": "List feedbacks with optional filters"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Bookings",
-      "item": [
-        {
-          "name": "Get Bookings",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/bookings?status=confirmed",
-              "host": ["{{base_url}}"],
-              "path": ["bookings"],
-              "query": [
-                {
-                  "key": "status",
-                  "value": "confirmed",
-                  "disabled": true
-                }
-              ]
-            },
-            "description": "Get all bookings for authenticated user (as customer or agency)"
-          },
-          "response": []
-        },
-        {
-          "name": "Get My Bookings",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/bookings/me",
-              "host": ["{{base_url}}"],
-              "path": ["bookings", "me"]
-            },
-            "description": "Alias for current user's bookings (customer or agency)"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Booking Details",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/bookings/1",
-              "host": ["{{base_url}}"],
-              "path": ["bookings", "1"]
-            },
-            "description": "Get detailed information about a specific booking"
-          },
-          "response": []
-        },
-        {
-          "name": "Create Booking",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "name": "Agency KYC",
+                "item": [
+                  { "name": "Get Agency KYC (me)", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/agency-kyc/me", "host": ["{{base_url}}"], "path": ["agency-kyc","me"] } }, "response": [] },
+                  { "name": "Upsert Agency KYC", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"panNumber\": \"AAAPA1234A\",\n  \"gstNumber\": \"18AABCU1234X1Z0\",\n  \"licenseNumber\": \"LIC-12345\",\n  \"panDocUrl\": \"https://example.com/pan.pdf\",\n  \"gstDocUrl\": \"https://example.com/gst.pdf\",\n  \"licenseDocUrl\": \"https://example.com/license.pdf\",\n  \"verificationStatus\": \"pending\"\n}" }, "url": { "raw": "{{base_url}}/agency-kyc", "host": ["{{base_url}}"], "path": ["agency-kyc"] } }, "response": [] },
+                  { "name": "Update Agency KYC by ID", "request": { "method": "PUT", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"verificationStatus\": \"pending\"\n}" }, "url": { "raw": "{{base_url}}/agency-kyc/{{kyc_id}}", "host": ["{{base_url}}"], "path": ["agency-kyc","{{kyc_id}}"] } }, "response": [] },
+                  { "name": "Verify Agency KYC (admin)", "request": { "method": "PUT", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"panVerified\": true,\n  \"gstVerified\": true,\n  \"licenseVerified\": true,\n  \"verificationStatus\": \"verified\",\n  \"rejectionReason\": \"\"\n}" }, "url": { "raw": "{{base_url}}/agency-kyc/{{kyc_id}}/verify", "host": ["{{base_url}}"], "path": ["agency-kyc","{{kyc_id}}","verify"] } }, "response": [] }
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"vehicleId\": 1,\n  \"agencyId\": 2,\n  \"startDate\": \"2025-01-15\",\n  \"endDate\": \"2025-01-20\",\n  \"pickupLocation\": \"Delhi Airport\",\n  \"dropoffLocation\": \"Gurugram\",\n  \"dailyRate\": 3500,\n  \"numberOfDays\": 5,\n  \"subtotal\": 17500,\n  \"tax\": 3150,\n  \"discount\": 0,\n  \"totalAmount\": 20650,\n  \"securityDeposit\": 10000,\n  \"notes\": \"Please deliver to the airport\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/bookings",
-              "host": ["{{base_url}}"],
-              "path": ["bookings"]
-            },
-            "description": "Create a new vehicle booking"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Booking Status",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "name": "KYC",
+                "item": [
+                  { "name": "Upload KYC Document (multipart)", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "body": { "mode": "formdata", "formdata": [ { "key": "docType", "value": "aadhaar" }, { "key": "file", "type": "file", "src": "" } ] }, "url": { "raw": "{{base_url}}/kyc/upload", "host": ["{{base_url}}"], "path": ["kyc","upload"] }, "description": "docType: aadhaar|dl|selfie. Updates avatar when selfie uploaded." }, "response": [] },
+                  { "name": "Get KYC Status", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/kyc/status", "host": ["{{base_url}}"], "path": ["kyc","status"] } }, "response": [] },
+                  { "name": "Submit KYC Metadata", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"aadhaarNumber\": \"1234-5678-9012\",\n  \"aadhaarDocumentUrl\": \"/uploads/kyc/aadhaar.pdf\",\n  \"drivingLicenseNumber\": \"DL-1234\",\n  \"dlDocumentUrl\": \"/uploads/kyc/dl.pdf\",\n  \"dlExpiryDate\": \"2026-12-31\",\n  \"panNumber\": \"AAAPA1234A\",\n  \"addressProofType\": \"passport\",\n  \"addressProofUrl\": \"/uploads/kyc/passport.pdf\",\n  \"selfieUrl\": \"/uploads/kyc/selfie.jpg\"\n}" }, "url": { "raw": "{{base_url}}/kyc/submit", "host": ["{{base_url}}"], "path": ["kyc","submit"] }, "description": "Submit metadata after uploads" }, "response": [] },
+                  { "name": "Verify KYC (admin)", "request": { "method": "PUT", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"aadhaarVerified\": true,\n  \"dlVerified\": true,\n  \"panVerified\": true,\n  \"addressVerified\": true,\n  \"verificationStatus\": \"approved\",\n  \"rejectionReason\": \"\"\n}" }, "url": { "raw": "{{base_url}}/kyc/verify/1", "host": ["{{base_url}}"], "path": ["kyc","verify","1"] } }, "response": [] },
+                  { "name": "Reset KYC (debug)", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "url": { "raw": "{{base_url}}/kyc/debug/reset", "host": ["{{base_url}}"], "path": ["kyc","debug","reset"] }, "description": "Testing helper: clears uploaded KYC files/flags" }, "response": [] }
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"confirmed\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/bookings/1/status",
-              "host": ["{{base_url}}"],
-              "path": ["bookings", "1", "status"]
-            },
-            "description": "Update booking status (confirmed, completed, cancelled)"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Payment Status",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "name": "Feedbacks",
+                "item": [
+                  { "name": "Submit Feedback", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"bookingId\": 1,\n  \"rating\": 5,\n  \"comment\": \"Great ride!\"\n}" }, "url": { "raw": "{{base_url}}/feedbacks", "host": ["{{base_url}}"], "path": ["feedbacks"] }, "description": "Only after booking status=completed" }, "response": [] },
+                  { "name": "List Feedbacks", "request": { "method": "GET", "url": { "raw": "{{base_url}}/feedbacks?agency_id=", "host": ["{{base_url}}"], "path": ["feedbacks"], "query": [ { "key": "agency_id", "value": "", "disabled": true }, { "key": "customer_id", "value": "", "disabled": true }, { "key": "booking_id", "value": "", "disabled": true } ] }, "description": "Optional filters: agency_id, customer_id, booking_id" }, "response": [] }
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"paymentStatus\": \"completed\",\n  \"transactionId\": \"TXN-123456789\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/bookings/1/payment-status",
-              "host": ["{{base_url}}"],
-              "path": ["bookings", "1", "payment-status"]
-            },
-            "description": "Update booking payment status"
-          },
-          "response": []
-        },
-        {
-          "name": "Cancel Booking",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "name": "Uploads",
+                "item": [
+                  { "name": "Upload Files (GCS)", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ], "body": { "mode": "formdata", "formdata": [ { "key": "files", "type": "file", "src": "" } ] }, "url": { "raw": "{{base_url}}/uploads", "host": ["{{base_url}}"], "path": ["uploads"] }, "description": "Upload multipart files to GCS bucket (images/pdf/webp/avif)" }, "response": [] }
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}"
-            },
-            "url": {
-              "raw": "{{base_url}}/bookings/1/cancel",
-              "host": ["{{base_url}}"],
-              "path": ["bookings", "1", "cancel"]
-            },
-            "description": "Cancel an existing booking"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Agencies",
-      "item": [
-        {
-          "name": "My Agency",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/agencies/me",
-              "host": ["{{base_url}}"],
-              "path": ["agencies", "me"]
-            },
-            "description": "Fetch agency profile for the authenticated user"
-          },
-          "response": []
-        },
-        {
-          "name": "Get All Agencies",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/agencies?page=1&per_page=10&city=Delhi",
-              "host": ["{{base_url}}"],
-              "path": ["agencies"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "per_page",
-                  "value": "10"
-                },
-                {
-                  "key": "city",
-                  "value": "Delhi",
-                  "disabled": true
-                }
-              ]
-            },
-            "description": "List all verified and active agencies with pagination"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Agency Details",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/agencies/1",
-              "host": ["{{base_url}}"],
-              "path": ["agencies", "1"]
-            },
-            "description": "Get detailed information about a specific agency"
-          },
-          "response": []
-        },
-        {
-          "name": "Create Agency",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "name": "Catalog",
+                "item": [
+                  { "name": "List Brands", "request": { "method": "GET", "url": { "raw": "{{base_url}}/catalog/brands?vehicle_type=car", "host": ["{{base_url}}"], "path": ["catalog","brands"], "query": [ { "key": "vehicle_type", "value": "car", "disabled": true } ] }, "description": "Optional vehicle_type filter" }, "response": [] },
+                  { "name": "List Models", "request": { "method": "GET", "url": { "raw": "{{base_url}}/catalog/models?brand_id=1", "host": ["{{base_url}}"], "path": ["catalog","models"], "query": [ { "key": "brand_id", "value": "1" } ] }, "description": "Requires brand_id" }, "response": [] },
+                  { "name": "List Models for Brand", "request": { "method": "GET", "url": { "raw": "{{base_url}}/catalog/brands/1/models", "host": ["{{base_url}}"], "path": ["catalog","brands","1","models"] }, "description": "Models under brand id" }, "response": [] }
+                ]
               },
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "name": "Cities",
+                "item": [
+                  { "name": "List Cities", "request": { "method": "GET", "url": { "raw": "{{base_url}}/cities?q=hyd", "host": ["{{base_url}}"], "path": ["cities"], "query": [ { "key": "q", "value": "hyd", "disabled": true } ] }, "description": "Optional search q" }, "response": [] }
+                ]
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"agencyName\": \"Premium Car Rentals\",\n  \"businessType\": \"Individual\",\n  \"registrationNumber\": \"REG-123456\",\n  \"gstNumber\": \"18AABCU1234X1Z0\",\n  \"panNumber\": \"AAAPA1234A\",\n  \"agencyPhone\": \"+91-9876543210\",\n  \"agencyEmail\": \"info@premiumrentals.com\",\n  \"address\": \"123 Main Street\",\n  \"city\": \"Delhi\",\n  \"state\": \"Delhi\",\n  \"postalCode\": \"110001\",\n  \"latitude\": 28.7041,\n  \"longitude\": 77.1025\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/agencies",
-              "host": ["{{base_url}}"],
-              "path": ["agencies"]
-            },
-            "description": "Create a new rental agency"
-          },
-          "response": []
-        },
+            "variable": [
+              { "key": "base_url", "value": "http://localhost:8085/api", "type": "string" },
+              { "key": "access_token", "value": "", "type": "string" },
+              { "key": "GCS_BUCKET", "value": "", "type": "string" },
+              { "key": "GCS_SERVICE_ACCOUNT_FILE", "value": "app/leafy-guide-474311-u3-0328c0e70b35.json", "type": "string" },
+              { "key": "DB_HOST", "value": "34.47.179.240", "type": "string" },
+              { "key": "DB_PORT", "value": "3306", "type": "string" },
+              { "key": "DB_NAME", "value": "rentkaro", "type": "string" },
+              { "key": "DB_USER", "value": "rentkaro_user", "type": "string" },
+              { "key": "DB_PASSWORD", "value": "RentKaro@2025#Strong", "type": "string" },
+              { "key": "FRONTEND_BASE_URL", "value": "http://localhost:3000", "type": "string" }
+            ]
+          }
         {
-          "name": "Update Agency",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"agencyPhone\": \"+91-9876543211\",\n  \"agencyEmail\": \"contact@premiumrentals.com\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/agencies/1",
-              "host": ["{{base_url}}"],
-              "path": ["agencies", "1"]
-            },
-            "description": "Update agency information"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "KYC Verification",
-      "item": [
-        {
-          "name": "Get Agency KYC (me)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/agency-kyc/me",
-              "host": ["{{base_url}}"],
-              "path": ["agency-kyc", "me"]
-            },
-            "description": "Get current agency KYC record"
-          },
-          "response": []
-        },
-        {
-          "name": "Upsert Agency KYC",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"panNumber\": \"AAAPA1234A\",\n  \"gstNumber\": \"18AABCU1234X1Z0\",\n  \"licenseNumber\": \"LIC-12345\",\n  \"panDocUrl\": \"https://example.com/pan.pdf\",\n  \"gstDocUrl\": \"https://example.com/gst.pdf\",\n  \"licenseDocUrl\": \"https://example.com/license.pdf\",\n  \"verificationStatus\": \"pending\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/agency-kyc",
-              "host": ["{{base_url}}"],
-              "path": ["agency-kyc"]
-            },
-            "description": "Create or update agency KYC for current agency"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Agency KYC",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"panNumber\": \"AAAPA1234A\",\n  \"gstNumber\": \"18AABCU1234X1Z0\",\n  \"licenseNumber\": \"LIC-12345\",\n  \"panDocUrl\": \"https://example.com/pan.pdf\",\n  \"gstDocUrl\": \"https://example.com/gst.pdf\",\n  \"licenseDocUrl\": \"https://example.com/license.pdf\",\n  \"verificationStatus\": \"pending\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/agency-kyc/{{kyc_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["agency-kyc", "{{kyc_id}}"]
-            },
-            "description": "Update agency KYC by id"
-          },
-          "response": []
-        },
-        {
-          "name": "Verify Agency KYC",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"panVerified\": true,\n  \"gstVerified\": true,\n  \"licenseVerified\": true,\n  \"verificationStatus\": \"verified\",\n  \"rejectionReason\": \"\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/agency-kyc/{{kyc_id}}/verify",
-              "host": ["{{base_url}}"],
-              "path": ["agency-kyc", "{{kyc_id}}", "verify"]
-            },
-            "description": "Verify agency KYC (admin)"
-          },
-          "response": []
-        },
-        {
-          "name": "Get KYC Status",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/kyc/status",
-              "host": ["{{base_url}}"],
-              "path": ["kyc", "status"]
-            },
-            "description": "Get KYC verification status for authenticated user"
-          },
-          "response": []
-        },
-        {
-          "name": "Submit KYC Documents",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"aadhaarNumber\": \"1234-5678-9012\",\n  \"aadhaarDocumentUrl\": \"https://example.com/aadhaar.pdf\",\n  \"drivingLicenseNumber\": \"DL-0000-1234-5678\",\n  \"dlDocumentUrl\": \"https://example.com/dl.pdf\",\n  \"dlExpiryDate\": \"2026-12-31\",\n  \"panNumber\": \"AAAPA1234A\",\n  \"addressProofType\": \"passport\",\n  \"addressProofUrl\": \"https://example.com/passport.pdf\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/kyc/submit",
-              "host": ["{{base_url}}"],
-              "path": ["kyc", "submit"]
-            },
-            "description": "Submit KYC verification documents"
-          },
-          "response": []
-        },
-        {
-          "name": "Verify KYC (Admin)",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"aadhaarVerified\": true,\n  \"dlVerified\": true,\n  \"panVerified\": true,\n  \"addressVerified\": true,\n  \"verificationStatus\": \"approved\",\n  \"rejectionReason\": \"\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/kyc/verify/1",
-              "host": ["{{base_url}}"],
-              "path": ["kyc", "verify", "1"]
-            },
-            "description": "Verify KYC documents (admin only)"
-          },
-          "response": []
-        }
-      ]
-    }
-  ],
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:8085/api",
-      "type": "string"
-    },
-    {
-      "key": "access_token",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "GCS_BUCKET",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "GCS_SERVICE_ACCOUNT_FILE",
-      "value": "app/leafy-guide-474311-u3-0328c0e70b35.json",
-      "type": "string"
-    },
-    {
-      "key": "DB_HOST",
-      "value": "34.47.179.240",
-      "type": "string"
-    },
-    {
-      "key": "DB_PORT",
-      "value": "3306",
-      "type": "string"
-    },
-    {
-      "key": "DB_NAME",
-      "value": "rentkaro",
-      "type": "string"
-    },
-    {
-      "key": "DB_USER",
-      "value": "rentkaro_user",
-      "type": "string"
-    },
-    {
-      "key": "DB_PASSWORD",
-      "value": "RentKaro@2025#Strong",
-      "type": "string"
-    }
-    ,
-    {
-      "key": "FRONTEND_BASE_URL",
-      "value": "http://localhost:3000",
-      "type": "string"
-    }
-  ]
-}
